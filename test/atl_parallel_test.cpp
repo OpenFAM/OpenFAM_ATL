@@ -120,12 +120,20 @@ int main(int argc, char *argv[]) {
   auto start = std::chrono::high_resolution_clock::now();
   for (i = 0; i < NUM_ITERATIONS; i++) {
     compflag = false;
-    myatlib->fam_put_atomic((void *)msg1, item1, 0, 200);
+    try {
+        myatlib->fam_put_atomic((void *)msg1, item1, 0, 200);
+    } catch(Fam_Exception &e) {
+        cout << "fam_put_atomic failed" << e.fam_error_msg() << endl;
+    }
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
     cout << "put atomic elapsed time: " << elapsed_seconds.count() << endl;
     start = std::chrono::high_resolution_clock::now();
-    myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+    try {
+        myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+    } catch(Fam_Exception &e) {
+        cout << "fam_get_atomic failed" << e.fam_error_msg() << endl;
+    }
     end = std::chrono::high_resolution_clock::now();
     elapsed_seconds = end - start;
     cout << "get atomic elapsed time: " << elapsed_seconds.count() << endl;

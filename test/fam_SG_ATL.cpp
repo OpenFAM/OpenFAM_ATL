@@ -94,7 +94,7 @@ int main() {
     dataRegion = my_fam->fam_lookup_region(DATA_REGION);
   } catch (Fam_Exception &e) {
     cout << "data Region not found" << endl;
-    dataRegion = my_fam->fam_create_region(DATA_REGION, 1048576, 0777, RAID1);
+    dataRegion = my_fam->fam_create_region(DATA_REGION, 1048576, 0777, NULL);
   }
   char msg1[200] = {0};
   char msg2[200] = {0};
@@ -108,17 +108,25 @@ int main() {
   for (i = 0; i < 200; i++)
     msg1[i] = 'X';
   auto start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_put_atomic((void *)msg1, item1, 0, 200); // strlen(msg1));
+  try {
+    myatlib->fam_put_atomic((void *)msg1, item1, 0, 200); // strlen(msg1));
+  } catch(Fam_Exception &e) {
+    cout << "fam_put_atomic failed" << e.fam_error_msg() << endl;
+  }
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   cout << "put atomic elapsed time: " << elapsed_seconds.count() << endl;
   start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_get_atomic((void *)msg2, item1, 0, 200); // strlen(msg1));
+  try {
+    myatlib->fam_get_atomic((void *)msg2, item1, 0, 200); // strlen(msg1));
+  } catch(Fam_Exception &e) {
+    cout << "fam_get_atomic failed" << e.fam_error_msg() << endl;
+  }
   end = std::chrono::high_resolution_clock::now();
   elapsed_seconds = end - start;
   cout << "get atomic elapsed time: " << elapsed_seconds.count() << endl;
   cout << msg2 << endl;
-  if (strcmp(msg1, msg2) != 0)
+  if (strncmp(msg1, msg2, 200) != 0)
     cout << "Test1: Comparison of full string failed" << endl;
   else
     cout << "Test1: Comparison of full string successful" << endl;
@@ -128,17 +136,29 @@ int main() {
   // sleep(30);
   cout << "Scatter atomic - strided" << endl;
   start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_scatter_atomic(msg1, item1, 5, 1, 2, 2);
+  try {
+    myatlib->fam_scatter_atomic(msg1, item1, 5, 1, 2, 2);
+  } catch(Fam_Exception &e) {
+    cout << "fam_scatter_atomic failed" << e.fam_error_msg() << endl;
+  }
   end = std::chrono::high_resolution_clock::now();
   elapsed_seconds = end - start;
   cout << "Scatter strided atomic elapsed time: " << elapsed_seconds.count()
        << endl;
-  myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+  try {
+    myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+  } catch(Fam_Exception &e) {
+    cout << "fam_get_atomic failed" << e.fam_error_msg() << endl;
+  }
   cout << msg2 << endl;
   cout << "Gather atomic - strided" << endl;
   memset(msg2, 0, 200);
   start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_gather_atomic(msg2, item1, 5, 1, 2, 2);
+  try {
+    myatlib->fam_gather_atomic(msg2, item1, 5, 1, 2, 2);
+  } catch(Fam_Exception &e) {
+    cout << "fam_gather_atomic failed" << e.fam_error_msg() << endl;
+  }
   end = std::chrono::high_resolution_clock::now();
   elapsed_seconds = end - start;
   cout << "Gather strided atomic elapsed time: " << elapsed_seconds.count()
@@ -153,17 +173,29 @@ int main() {
     msg1[i] = 'Z';
   uint64_t indexes[] = {10, 17, 13, 15, 30};
   start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_scatter_atomic(msg1, item1, 5, indexes, 2);
+  try {
+    myatlib->fam_scatter_atomic(msg1, item1, 5, indexes, 2);
+  } catch(Fam_Exception &e) {
+    cout << "fam_scatter_atomic failed" << e.fam_error_msg() << endl;
+  }
   end = std::chrono::high_resolution_clock::now();
   elapsed_seconds = end - start;
   cout << "Scatter indexed atomic elapsed time: " << elapsed_seconds.count()
        << endl;
-  myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+  try {
+    myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+  } catch(Fam_Exception &e) {
+    cout << "fam_get_atomic failed" << e.fam_error_msg() << endl;
+  }
   cout << msg2 << endl;
   cout << "Gather atomic - indexed" << endl;
   memset(msg2, 0, 200);
   start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_gather_atomic(msg2, item1, 5, indexes, 2);
+  try {
+    myatlib->fam_gather_atomic(msg2, item1, 5, indexes, 2);
+  } catch(Fam_Exception &e) {
+    cout << "fam_gather_atomic failed" << e.fam_error_msg() << endl;
+  }
   end = std::chrono::high_resolution_clock::now();
   elapsed_seconds = end - start;
   cout << "Gather indexed atomic elapsed time: " << elapsed_seconds.count()
