@@ -501,8 +501,8 @@ int atl_finalize() {
 
     if (serverAddrName) free(serverAddrName);
 
-    if (defaultCtx != NULL)
-        delete defaultCtx;
+    //if (defaultCtx != NULL)
+    //    delete defaultCtx;
     return 0;
 }
 
@@ -602,7 +602,7 @@ int fam_get_atomic(void *local, Fam_Descriptor *descriptor,
         fi_context *ctx = fabric_post_response_buff(&retStatus,(*fiAddrs)[nodeId], ATLCtx,sizeof(retStatus));
         ret = famCIS->get_atomic(globalDescriptor.regionId & REGIONID_MASK,
 				 globalDescriptor.offset, offset, nbytes,
-				 key, get_selfAddr(nodeId), get_selfAddrLen(nodeId),
+				 key, (uint64_t)local, get_selfAddr(nodeId), get_selfAddrLen(nodeId),
 				 nodeId, uid, gid);
 			
         if (ret == 0) {
@@ -664,7 +664,7 @@ int fam_put_atomic(void *local, Fam_Descriptor *descriptor,
 
         ret = famCIS->put_atomic(globalDescriptor.regionId & REGIONID_MASK,
                                  globalDescriptor.offset, offset, nbytes,
-                                 key, get_selfAddr(nodeId),get_selfAddrLen(nodeId),
+                                 key, (uint64_t)local, get_selfAddr(nodeId),get_selfAddrLen(nodeId),
                                  (const char *)local, nodeId, uid, gid);
 
 	if ((ret == 0) && (nbytes > MAX_DATA_IN_MSG)) {
@@ -691,16 +691,18 @@ int fam_scatter_atomic(void *local, Fam_Descriptor *descriptor,
   int32_t retStatus = -1;
   fi_context *ctx = NULL;
   Fam_Global_Descriptor globalDescriptor;
-  //    FAM_CNTR_INC_API(fam_put_atomic);
-  //    FAM_PROFILE_START_ALLOCATOR(fam_put_atomic);
+
+  ATL_CNTR_INC_API(fam_scatter_atomic);
+  ATL_PROFILE_START_ALLOCATOR(fam_scatter_atomic);
   if ((local == NULL) || (descriptor == NULL) || (nElements == 0)) {
     message << "Invalid Options";
     THROW_ATL_ERR_MSG(ATL_Exception, message.str().c_str());
   }
 
   ret = validate_item(descriptor);
-  //    FAM_PROFILE_END_ALLOCATOR(fam_put_atomic);
-  //    FAM_PROFILE_START_OPS(fam_put_atomic);
+  ATL_PROFILE_END_ALLOCATOR(fam_scatter_atomic);
+  ATL_PROFILE_START_OPS(fam_scatter_atomic);
+
   if (ret == 0) {
     // Read data from FAM region with this key
     globalDescriptor = descriptor->get_global_descriptor();
@@ -722,7 +724,7 @@ int fam_scatter_atomic(void *local, Fam_Descriptor *descriptor,
 
     ret = famCIS->scatter_strided_atomic(
         globalDescriptor.regionId & REGIONID_MASK, globalDescriptor.offset,
-        nElements, firstElement, stride, elementSize, key, get_selfAddr(nodeId),
+        nElements, firstElement, stride, elementSize, key, (uint64_t) local, get_selfAddr(nodeId),
         get_selfAddrLen(nodeId), nodeId, uid, gid);
 
     if (ret == 0) {
@@ -730,7 +732,7 @@ int fam_scatter_atomic(void *local, Fam_Descriptor *descriptor,
       ret = retStatus;
       fabric_deregister_mr(mr);
     }
-    //    FAM_PROFILE_END_OPS(fam_put_atomic);
+    ATL_PROFILE_END_OPS(fam_scatter_atomic);
   } // validate_item
   return ret;
 }
@@ -746,16 +748,18 @@ int fam_gather_atomic(void *local, Fam_Descriptor *descriptor,
   int32_t retStatus = -1;
   fi_context *ctx = NULL;
   Fam_Global_Descriptor globalDescriptor;
-  //    FAM_CNTR_INC_API(fam_put_atomic);
-  //    FAM_PROFILE_START_ALLOCATOR(fam_put_atomic);
+  ATL_CNTR_INC_API(fam_gather_atomic);
+  ATL_PROFILE_START_ALLOCATOR(fam_gather_atomic);
+
   if ((local == NULL) || (descriptor == NULL) || (nElements == 0)) {
     message << "Invalid Options";
     THROW_ATL_ERR_MSG(ATL_Exception, message.str().c_str());
   }
 
   ret = validate_item(descriptor);
-  //    FAM_PROFILE_END_ALLOCATOR(fam_put_atomic);
-  //    FAM_PROFILE_START_OPS(fam_put_atomic);
+  ATL_PROFILE_END_ALLOCATOR(fam_gather_atomic);
+  ATL_PROFILE_START_OPS(fam_gather_atomic);
+
   if (ret == 0) {
     // Read data from FAM region with this key
     globalDescriptor = descriptor->get_global_descriptor();
@@ -777,7 +781,7 @@ int fam_gather_atomic(void *local, Fam_Descriptor *descriptor,
 
     ret = famCIS->gather_strided_atomic(
         globalDescriptor.regionId & REGIONID_MASK, globalDescriptor.offset,
-        nElements, firstElement, stride, elementSize, key, get_selfAddr(nodeId),
+        nElements, firstElement, stride, elementSize, key, (uint64_t) local, get_selfAddr(nodeId),
         get_selfAddrLen(nodeId), nodeId, uid, gid);
 
     if (ret == 0) {
@@ -785,7 +789,7 @@ int fam_gather_atomic(void *local, Fam_Descriptor *descriptor,
       ret = retStatus;
       fabric_deregister_mr(mr);
     }
-    //    FAM_PROFILE_END_OPS(fam_put_atomic);
+    ATL_PROFILE_END_OPS(fam_gather_atomic);
   } // validate_item
   return ret;
 }
@@ -801,16 +805,18 @@ int fam_scatter_atomic(void *local, Fam_Descriptor *descriptor,
   int32_t retStatus = -1;
   fi_context *ctx = NULL;
   Fam_Global_Descriptor globalDescriptor;
-  //    FAM_CNTR_INC_API(fam_put_atomic);
-  //    FAM_PROFILE_START_ALLOCATOR(fam_put_atomic);
+  ATL_CNTR_INC_API(fam_scatter_atomic);
+  ATL_PROFILE_START_ALLOCATOR(fam_scatter_atomic);
+
   if ((local == NULL) || (descriptor == NULL) || (nElements == 0)) {
     message << "Invalid Options";
     THROW_ATL_ERR_MSG(ATL_Exception, message.str().c_str());
   }
 
   ret = validate_item(descriptor);
-  //    FAM_PROFILE_END_ALLOCATOR(fam_put_atomic);
-  //    FAM_PROFILE_START_OPS(fam_put_atomic);
+  ATL_PROFILE_END_ALLOCATOR(fam_scatter_atomic);
+  ATL_PROFILE_START_OPS(fam_scatter_atomic);
+
   if (ret == 0) {
     // Read data from FAM region with this key
     globalDescriptor = descriptor->get_global_descriptor();
@@ -842,7 +848,7 @@ int fam_scatter_atomic(void *local, Fam_Descriptor *descriptor,
 
     ret = famCIS->scatter_indexed_atomic(
         globalDescriptor.regionId & REGIONID_MASK, globalDescriptor.offset,
-        nElements, string(indexStr.str()).c_str(), elementSize, key,
+        nElements, string(indexStr.str()).c_str(), elementSize, key, (uint64_t) local,
         get_selfAddr(nodeId), get_selfAddrLen(nodeId), nodeId, uid, gid);
 
     if (ret == 0) {
@@ -850,7 +856,7 @@ int fam_scatter_atomic(void *local, Fam_Descriptor *descriptor,
       ret = retStatus;
       fabric_deregister_mr(mr);
     }
-    //    FAM_PROFILE_END_OPS(fam_put_atomic);
+    ATL_PROFILE_END_OPS(fam_scatter_atomic);
   } // validate_item
   return ret;
 }
@@ -865,16 +871,18 @@ int fam_gather_atomic(void *local, Fam_Descriptor *descriptor,
   int32_t retStatus = -1;
   fi_context *ctx = NULL;
   Fam_Global_Descriptor globalDescriptor;
-  //    FAM_CNTR_INC_API(fam_put_atomic);
-  //    FAM_PROFILE_START_ALLOCATOR(fam_put_atomic);
+  ATL_CNTR_INC_API(fam_gather_atomic);
+  ATL_PROFILE_START_ALLOCATOR(fam_gather_atomic);
+
   if ((local == NULL) || (descriptor == NULL) || (nElements == 0)) {
     message << "Invalid Options";
     THROW_ATL_ERR_MSG(ATL_Exception, message.str().c_str());
   }
 
   ret = validate_item(descriptor);
-  //    FAM_PROFILE_END_ALLOCATOR(fam_put_atomic);
-  //    FAM_PROFILE_START_OPS(fam_put_atomic);
+  ATL_PROFILE_END_ALLOCATOR(fam_gather_atomic);
+  ATL_PROFILE_START_OPS(fam_gather_atomic);
+
   if (ret == 0) {
     // Read data from FAM region with this key
     globalDescriptor = descriptor->get_global_descriptor();
@@ -914,7 +922,7 @@ int fam_gather_atomic(void *local, Fam_Descriptor *descriptor,
       ret = retStatus;
       fabric_deregister_mr(mr);
     }
-    //    FAM_PROFILE_END_OPS(fam_put_atomic);
+    ATL_PROFILE_END_OPS(fam_gather_atomic);
   } // validate_item
   return ret;
 }

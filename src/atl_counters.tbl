@@ -1,2 +1,4 @@
 ATL_COUNTER(fam_get_atomic)
 ATL_COUNTER(fam_put_atomic)
+ATL_COUNTER(fam_scatter_atomic)
+ATL_COUNTER(fam_gather_atomic)

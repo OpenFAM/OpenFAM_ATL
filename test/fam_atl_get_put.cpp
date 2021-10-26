@@ -100,7 +100,7 @@ int main() {
     dataRegion = my_fam->fam_lookup_region(DATA_REGION);
   } catch (Fam_Exception &e) {
     cout << "data Region not found" << endl;
-    dataRegion = my_fam->fam_create_region(DATA_REGION, 1048576, 0777, RAID1);
+    dataRegion = my_fam->fam_create_region(DATA_REGION, 1048576, 0777, NULL);
   }
   char msg1[200] = {0};
   char msg2[200] = {0};
@@ -114,12 +114,20 @@ int main() {
   for (i = 0; i < 200; i++)
     msg1[i] = 'X';
   auto start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_put_atomic((void *)msg1, item1, 0, 200);
+  try {
+    myatlib->fam_put_atomic((void *)msg1, item1, 0, 200);
+  } catch(Fam_Exception &e) {
+    cout << "fam_put_atomic failed" << e.fam_error_msg() << endl;
+  }
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   cout << "put atomic elapsed time: " << elapsed_seconds.count() << endl;
   start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_get_atomic((void *)msg2, item1, 0, 200); // strlen(msg1));
+  try {
+    myatlib->fam_get_atomic((void *)msg2, item1, 0, 200); // strlen(msg1));
+  } catch(Fam_Exception &e) {
+    cout << "fam_get_atomic failed" << e.fam_error_msg() << endl;
+  }
   end = std::chrono::high_resolution_clock::now();
   elapsed_seconds = end - start;
   cout << "get atomic elapsed time: " << elapsed_seconds.count() << endl;
@@ -137,12 +145,20 @@ int main() {
     msg1[i] = 'Y';
   memset(msg2, 0, 200);
   start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_put_atomic((void *)msg1, item1, 20, 150);
+  try {
+    myatlib->fam_put_atomic((void *)msg1, item1, 20, 150);
+  } catch(Fam_Exception &e) {
+    cout << "fam_put_atomic failed" << e.fam_error_msg() << endl;
+  }
   end = std::chrono::high_resolution_clock::now();
   elapsed_seconds = end - start;
   cout << "put atomic elapsed time: " << elapsed_seconds.count() << endl;
 
-  myatlib->fam_get_atomic((void *)msg2, item1, 20, 150);
+  try {
+    myatlib->fam_get_atomic((void *)msg2, item1, 20, 150);
+  } catch(Fam_Exception &e) {
+    cout << "fam_get_atomic failed" << e.fam_error_msg() << endl;
+  }
   cout << msg2 << endl;
   if (strncmp(msg2, strchr(msg1, 'Y'), 150) == 0)
     cout << "Test 2: Comaparion of partial string successful" << endl;
@@ -150,7 +166,11 @@ int main() {
     cout << "Test 2:Comaparion of partial string failed" << endl;
   cout << "reading the complete data" << endl;
   memset(msg2, 0, 200);
-  myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+  try {
+    myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+  } catch(Fam_Exception &e) {
+    cout << "fam_get_atomic failed" << e.fam_error_msg() << endl;
+  }
   cout << msg2 << endl;
   for (i = 0; i < 20; i++) {
     if (msg2[i] != 'X')
@@ -177,12 +197,20 @@ int main() {
   for (i = 0; i < 200; i++)
     msg1[i] = 'Z';
   start = std::chrono::high_resolution_clock::now();
-  myatlib->fam_put_atomic((void *)msg1, item1, 50, 100);
+  try {
+    myatlib->fam_put_atomic((void *)msg1, item1, 50, 100);
+  } catch(Fam_Exception &e) {
+    cout << "fam_put_atomic failed" << e.fam_error_msg() << endl;
+  }
   end = std::chrono::high_resolution_clock::now();
   elapsed_seconds = end - start;
   cout << "put atomic elapsed time: " << elapsed_seconds.count() << endl;
 
-  myatlib->fam_get_atomic((void *)msg2, item1, 50, 100);
+  try {
+    myatlib->fam_get_atomic((void *)msg2, item1, 50, 100);
+  } catch(Fam_Exception &e) {
+    cout << "fam_get_atomic failed" << e.fam_error_msg() << endl;
+  }
   cout << msg2 << endl;
   if (strncmp(msg2, strchr(msg1, 'Z'), 100) == 0)
     cout << "Comaparion of partial string successful" << endl;
@@ -191,7 +219,11 @@ int main() {
 
   cout << "reading the complete data" << endl;
   memset(msg2, 0, 200);
-  myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+  try {
+    myatlib->fam_get_atomic((void *)msg2, item1, 0, 200);
+  } catch(Fam_Exception &e) {
+    cout << "fam_get_atomic failed" << e.fam_error_msg() << endl;
+  }
   cout << msg2 << endl;
   for (i = 0; i < 20; i++) {
     if (msg2[i] != 'X')
